@@ -1,6 +1,7 @@
 package youdao
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"time"
@@ -51,8 +52,7 @@ type youdaoResponse struct {
 }
 
 // documention: https://ai.youdao.com/DOCSIRMA/html/trans/api/wbfy/index.html
-func youdaoTranslate(cfg *translate.Config) (string, error) {
-	time.Sleep(time.Second) // 接口频率限制：1次/秒
+func youdaoTranslate(ctx context.Context, cfg *translate.Config) (string, error) {
 	data := youdaoRequest{
 		Query:     cfg.Input,
 		From:      fixLang(cfg.From),
@@ -70,7 +70,8 @@ func youdaoTranslate(cfg *translate.Config) (string, error) {
 	data.Sign = com.Sha256(data.APPKey + input + data.Salt + data.CurrentTS + cfg.APIConfig[`secret`]) // 应用ID+input+salt+curtime+应用密钥
 	endpoint := `https://openapi.youdao.com/api`
 	r := &youdaoResponse{}
-	req := restyclient.Classic()
+	req := restyclient.Retryable()
+	req.SetContext(ctx)
 	req.SetHeader(`Accept`, `application/json`)
 	//req.SetAuthToken(data.APPKey)
 	//req.SetBody(data)

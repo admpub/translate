@@ -1,12 +1,12 @@
 package baidu
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/url"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/admpub/translate"
 	"github.com/webx-top/com"
@@ -37,8 +37,7 @@ type baiduResponse struct {
 }
 
 // documention: https://fanyi-api.baidu.com/product/113
-func baiduTranslate(cfg *translate.Config) (string, error) {
-	time.Sleep(time.Second) // 接口频率限制：1次/秒
+func baiduTranslate(ctx context.Context, cfg *translate.Config) (string, error) {
 	values := url.Values{
 		`q`:     []string{cfg.Input},
 		`from`:  []string{strings.SplitN(cfg.From, `-`, 2)[0]},
@@ -55,7 +54,8 @@ func baiduTranslate(cfg *translate.Config) (string, error) {
 	} else {
 		endpoint = `https://fanyi-api.baidu.com/api/trans/vip/translate`
 	}
-	req := restyclient.Classic()
+	req := restyclient.Retryable()
+	req.SetContext(ctx)
 	resp, e := req.SetFormDataFromValues(values).Post(endpoint)
 	if e != nil {
 		return cfg.Input, e

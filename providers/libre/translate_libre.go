@@ -1,6 +1,7 @@
 package libre
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/admpub/translate"
@@ -32,7 +33,7 @@ func fixLang(lang string) string {
 	}
 }
 
-func libreTranslate(cfg *translate.Config) (string, error) {
+func libreTranslate(ctx context.Context, cfg *translate.Config) (string, error) {
 	data := libreRequest{
 		Query:  cfg.Input,
 		Source: fixLang(cfg.From),
@@ -51,7 +52,8 @@ func libreTranslate(cfg *translate.Config) (string, error) {
 		endpoint = `https://` + host + `/translate`
 	}
 	r := &libreResponse{}
-	req := restyclient.Classic()
+	req := restyclient.Retryable()
+	req.SetContext(ctx)
 	req.SetBody(data).SetResult(r).SetHeader(`Content-Type`, `application/json`).SetHeader(`Accept`, `application/json`)
 	resp, e := req.Post(endpoint)
 	if e != nil {

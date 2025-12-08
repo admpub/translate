@@ -2,6 +2,7 @@ package youdao
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -48,8 +49,7 @@ type youdaoAIResponseData struct {
 	TransFull      string `json:"transFull"`
 }
 
-func youdaoAITranslate(cfg *translate.Config) (string, error) {
-	time.Sleep(time.Second) // 接口频率限制：1次/秒
+func youdaoAITranslate(ctx context.Context, cfg *translate.Config) (string, error) {
 	data := youdaoAIRequest{
 		Input:     cfg.Input,
 		From:      fixLang(cfg.From),
@@ -66,7 +66,8 @@ func youdaoAITranslate(cfg *translate.Config) (string, error) {
 	}
 	data.Sign = com.Sha256(data.APPKey + input + data.Salt + data.CurrentTS + cfg.APIConfig[`secret`]) // 应用ID+input+salt+curtime+应用密钥
 	endpoint := `https://openapi.youdao.com/proxy/http/llm-trans`
-	req := restyclient.Classic().SetDoNotParseResponse(true)
+	req := restyclient.Retryable().SetDoNotParseResponse(true)
+	req.SetContext(ctx)
 	req.SetHeader(`Content-Type`, `application/json`).SetHeader(`Accept`, `text/event-stream`)
 	//req.SetAuthToken(data.APPKey)
 	resp, err := req.SetBody(data).Post(endpoint)

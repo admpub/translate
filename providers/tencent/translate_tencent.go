@@ -1,6 +1,7 @@
 package tencent
 
 import (
+	"context"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/hex"
@@ -52,10 +53,9 @@ type tencentResponseError struct {
 const tencentMaxBytes = 6000
 
 // documention: https://cloud.tencent.com/document/product/551/40566
-func tencentTranslate(cfg *translate.Config) (string, error) {
-	time.Sleep(time.Millisecond * 220) // 接口频率限制：5次/秒
+func tencentTranslate(ctx context.Context, cfg *translate.Config) (string, error) {
 	url := `https://tmt.tencentcloudapi.com`
-	req := restyclient.Classic()
+	req := restyclient.Retryable()
 	data := tencentRequest{
 		SourceTextList: []string{cfg.Input},
 		Source:         strings.SplitN(cfg.From, `-`, 2)[0],
@@ -65,6 +65,7 @@ func tencentTranslate(cfg *translate.Config) (string, error) {
 	secretId := cfg.APIConfig[`appid`]
 	secretKey := cfg.APIConfig[`secret`]
 	r := &tencentResponse{}
+	req.SetContext(ctx)
 	req.SetBody(data).SetResult(r).SetHeaders(makeTencentSign(secretId, secretKey, string(body)))
 	resp, e := req.Post(url)
 	if e != nil {

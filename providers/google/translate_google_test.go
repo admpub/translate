@@ -1,6 +1,7 @@
 package google
 
 import (
+	"context"
 	"testing"
 
 	"github.com/admpub/translate"
@@ -8,7 +9,7 @@ import (
 )
 
 func TestGoogle(t *testing.T) {
-	text, err := googleTranslate(translate.NewConfig(`测试`, `zh-CN`, `en`, `text`))
+	text, err := googleTranslate(context.TODO(), translate.NewConfig(`测试`, `zh-CN`, `en`, `text`))
 	assert.Equal(t, nil, err)
 	assert.Equal(t, `test`, text)
 }
