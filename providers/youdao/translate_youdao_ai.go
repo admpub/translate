@@ -91,7 +91,7 @@ func youdaoAITranslate(ctx context.Context, cfg *translate.Config) (string, erro
 			if err != nil {
 				return cfg.Input, err
 			}
-			translatedText = r.Data.TransIncrement
+			translatedText += r.Data.TransIncrement
 		}
 	}
 	return translatedText, err
