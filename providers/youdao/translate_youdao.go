@@ -51,7 +51,11 @@ type youdaoResponse struct {
 	Translation []string `json:"translation"`
 }
 
-// documention: https://ai.youdao.com/DOCSIRMA/html/trans/api/wbfy/index.html
+// youdaoTranslate performs translation using Youdao API.
+//
+// API documentation: https://ai.youdao.com/DOCSIRMA/html/trans/api/wbfy/index.html
+//
+//	APIConfig: {"appid": "appid", "secret": "secret"}
 func youdaoTranslate(ctx context.Context, cfg *translate.Config) (string, error) {
 	data := youdaoRequest{
 		Query:     cfg.Input,

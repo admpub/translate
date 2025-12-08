@@ -36,7 +36,11 @@ type baiduResponse struct {
 	Results []*baiduTransResult `json:"trans_result"`
 }
 
-// documention: https://fanyi-api.baidu.com/product/113
+// baiduTranslate performs translation using Baidu's translation API.
+//
+// API documentation: https://fanyi-api.baidu.com/product/113
+//
+//	APIConfig: {"appid": "appid", "secret": "secret", "ai": "true"}
 func baiduTranslate(ctx context.Context, cfg *translate.Config) (string, error) {
 	values := url.Values{
 		`q`:     []string{cfg.Input},

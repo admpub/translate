@@ -33,6 +33,11 @@ func fixLang(lang string) string {
 	}
 }
 
+// libreTranslate translates text using the LibreTranslate API.
+//
+// API documentation: https://libretranslate.com/
+//
+//	APIConfig: {"apikey": "apikey", "endpoint": "https://libretranslate.com/translate"} or {"apikey": "apikey", "host": "libretranslate.com"}
 func libreTranslate(ctx context.Context, cfg *translate.Config) (string, error) {
 	data := libreRequest{
 		Query:  cfg.Input,

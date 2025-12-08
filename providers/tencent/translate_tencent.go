@@ -52,7 +52,11 @@ type tencentResponseError struct {
 
 const tencentMaxBytes = 6000
 
-// documention: https://cloud.tencent.com/document/product/551/40566
+// tencentTranslate sends a translation request to Tencent Cloud Translation API.
+//
+// API documentation: https://cloud.tencent.com/document/product/551/40566
+//
+//	APIConfig: {"appid": "appid", "secret": "secret"}
 func tencentTranslate(ctx context.Context, cfg *translate.Config) (string, error) {
 	url := `https://tmt.tencentcloudapi.com`
 	req := restyclient.Retryable()

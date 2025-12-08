@@ -49,6 +49,11 @@ type youdaoAIResponseData struct {
 	TransFull      string `json:"transFull"`
 }
 
+// youdaoAITranslate performs translation using Youdao AI API.
+//
+// API documentation: https://ai.youdao.com/DOCSIRMA/html/trans/api/dmxfy/index.html
+//
+//	APIConfig: {"appid": "appid", "secret": "secret", "prompt": "prompt"}
 func youdaoAITranslate(ctx context.Context, cfg *translate.Config) (string, error) {
 	data := youdaoAIRequest{
 		Input:     cfg.Input,
