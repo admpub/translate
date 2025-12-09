@@ -12,6 +12,9 @@ type Config struct {
 
 // SetAPIConfig sets the API configuration value for the given key and returns the Config for chaining.
 func (c *Config) SetAPIConfig(key, value string) *Config {
+	if c.APIConfig == nil {
+		c.APIConfig = map[string]string{}
+	}
 	c.APIConfig[key] = value
 	return c
 }
@@ -22,7 +25,7 @@ func (c *Config) Reset() *Config {
 	c.From = ""
 	c.To = ""
 	c.Format = ""
-	clear(c.APIConfig)
+	c.APIConfig = nil
 	return c
 }
 
@@ -32,6 +35,13 @@ func (c *Config) Release() {
 		return
 	}
 	ReleaseConfig(c)
+}
+
+// SetDefaults initializes the Config's APIConfig map if it is nil
+func (c *Config) SetDefaults() {
+	if c.APIConfig == nil {
+		c.APIConfig = map[string]string{}
+	}
 }
 
 // NewConfig creates a new Config instance with the specified input, source language, target language, and format.

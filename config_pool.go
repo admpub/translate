@@ -5,7 +5,7 @@ import "sync"
 // configPool is a sync.Pool for reusing Config instances.
 var configPool = sync.Pool{
 	New: func() interface{} {
-		return &Config{APIConfig: map[string]string{}, inPool: true}
+		return &Config{inPool: true}
 	},
 }
 
