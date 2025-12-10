@@ -21,8 +21,8 @@ type libreBatchRequest struct {
 
 type libreDetectRequest struct {
 	Query  string `json:"q"`
-	Format string `json:"format"`
-	APIKey string `json:"api_key"`
+	Format string `json:"format,omitempty"`
+	APIKey string `json:"api_key,omitempty"`
 }
 
 type CommonRequest struct {
@@ -127,7 +127,7 @@ func DetectLanguage(ctx context.Context, cfg *translate.Config) (string, error) 
 	r := []*libreDetectResponse{}
 	req := restyclient.Retryable()
 	req.SetContext(ctx)
-	req.SetBody(&data).SetResult(r).SetHeader(`Content-Type`, `application/json`).SetHeader(`Accept`, `application/json`)
+	req.SetBody(data).SetResult(&r).SetHeader(`Content-Type`, `application/json`).SetHeader(`Accept`, `application/json`)
 	resp, e := req.Post(endpoint)
 	if e != nil {
 		return cfg.Input, e
