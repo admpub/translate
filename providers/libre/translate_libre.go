@@ -9,6 +9,8 @@ import (
 	"github.com/webx-top/restyclient"
 )
 
+var DefaultHost = `libretranslate.com`
+
 type libreRequest struct {
 	Query string `json:"q"`
 	CommonRequest
@@ -62,7 +64,7 @@ func fixLang(lang string) string {
 //
 // API documentation: https://libretranslate.com/
 //
-//	APIConfig: {"apikey": "apikey", "endpoint": "https://libretranslate.com/translate"} or {"apikey": "apikey", "host": "libretranslate.com"}
+//	APIConfig: {"apikey": "apikey", "endpoint": "https://libretranslate.com/translate"} or {"apikey": "apikey", "host": "libretranslate.com", "scheme": "https"}
 func libreTranslate(ctx context.Context, cfg *translate.Config) (string, error) {
 	comm := CommonRequest{
 		Source: fixLang(cfg.From),
@@ -78,11 +80,15 @@ func libreTranslate(ctx context.Context, cfg *translate.Config) (string, error) 
 	if cfg.APIConfig[`endpoint`] != `` {
 		endpoint = cfg.APIConfig[`endpoint`]
 	} else {
-		host := `libretranslate.com`
+		host := DefaultHost
+		scheme := `https`
+		if cfg.APIConfig[`scheme`] != `` {
+			scheme = cfg.APIConfig[`scheme`]
+		}
 		if cfg.APIConfig[`host`] != `` {
 			host = cfg.APIConfig[`host`]
 		}
-		endpoint = `https://` + host + `/translate`
+		endpoint = scheme + `://` + host + `/translate`
 	}
 	r := &libreResponse{}
 	req := restyclient.Retryable()
@@ -103,7 +109,7 @@ func libreTranslate(ctx context.Context, cfg *translate.Config) (string, error) 
 // The function constructs the API endpoint based on the configuration, sends a detection request,
 // and processes the response to determine the language.
 //
-//	APIConfig: {"apikey": "apikey", "endpoint": "https://libretranslate.com/translate"} or {"apikey": "apikey", "host": "libretranslate.com"}
+//	APIConfig: {"apikey": "apikey", "endpoint": "https://libretranslate.com/translate"} or {"apikey": "apikey", "host": "libretranslate.com", "scheme": "https"}
 func DetectLanguage(ctx context.Context, cfg *translate.Config) (string, error) {
 	var endpoint string
 	if cfg.APIConfig[`endpoint`] != `` {
@@ -113,11 +119,15 @@ func DetectLanguage(ctx context.Context, cfg *translate.Config) (string, error) 
 			endpoint += `/detect`
 		}
 	} else {
-		host := `libretranslate.com`
+		host := DefaultHost
 		if cfg.APIConfig[`host`] != `` {
 			host = cfg.APIConfig[`host`]
 		}
-		endpoint = `https://` + host + `/detect`
+		scheme := `https`
+		if cfg.APIConfig[`scheme`] != `` {
+			scheme = cfg.APIConfig[`scheme`]
+		}
+		endpoint = scheme + `://` + host + `/detect`
 	}
 	data := &libreDetectRequest{
 		Query:  cfg.Input,
