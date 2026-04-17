@@ -76,8 +76,8 @@ func ollamaTranslate(ctx context.Context, cfg *translate.Config) (string, error)
 		`TEXT`:        cfg.Input,
 	})
 	dsn := &ollama.DSN{
-		URL:   cfg.APIConfig[`url`],
-		Token: cfg.APIConfig[`token`],
+		URL:   cfg.GetAPIConfig(`url`, `endpoint`),
+		Token: cfg.GetAPIConfig(`token`, `apikey`),
 	}
 	client := ollama.NewOpenWebUiClient(dsn)
 	var result strings.Builder

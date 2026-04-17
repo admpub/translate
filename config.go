@@ -19,6 +19,23 @@ func (c *Config) SetAPIConfig(key, value string) *Config {
 	return c
 }
 
+func (c *Config) GetAPIConfig(key string, otherKeys ...string) string {
+	if c.APIConfig == nil {
+		return ``
+	}
+	v, y := c.APIConfig[key]
+	if y && len(v) > 0 {
+		return v
+	}
+	for _, key := range otherKeys {
+		v, y = c.APIConfig[key]
+		if y && len(v) > 0 {
+			return v
+		}
+	}
+	return v
+}
+
 // Reset resets all configuration fields to their zero values and returns the Config pointer for method chaining.
 func (c *Config) Reset() *Config {
 	c.Input = ""
