@@ -95,10 +95,10 @@ func ollamaTranslate(ctx context.Context, cfg *translate.Config) (string, error)
 	client := ollama.NewOpenWebUiClient(dsn)
 	var result strings.Builder
 	req := ollama.Request{
-		Model:   "translategemma",
-		Prompt:  prompt,
+		Model:  "translategemma",
+		Prompt: prompt,
 		Options: &ollama.RequestOptions{
-			//Temperature: new(0.9),
+			Temperature: new(0.1),
 			//NumContext: new(4096),
 		},
 		OnJson: func(res ollama.Response) error {
