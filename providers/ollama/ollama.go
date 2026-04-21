@@ -21,8 +21,8 @@ func init() {
 // 用Docker启动ollama：https://docs.ollama.com/docker
 
 const (
-	PromptTranslateGEMMA = `You are a professional {SOURCE_LANG} ({SOURCE_CODE}) to {TARGET_LANG} ({TARGET_CODE}) translator. Your goal is to accurately convey the meaning and nuances of the original {SOURCE_LANG} {CONTENT_TYPE} while adhering to {TARGET_LANG} grammar, vocabulary, and cultural sensitivities.
-Produce only the {TARGET_LANG} translation, without any additional explanations or commentary. Please translate the following {SOURCE_LANG} {CONTENT_TYPE} into {TARGET_LANG}:
+	PromptTranslateGEMMA = `You are a professional {SOURCE_LANG} ({SOURCE_CODE}) to {TARGET_LANG} ({TARGET_CODE}) translator. Your goal is to accurately convey the meaning and nuances of the original {SOURCE_LANG} text while adhering to {TARGET_LANG} grammar, vocabulary, and cultural sensitivities.
+Produce only the {TARGET_LANG} translation, without any additional explanations or commentary. Please translate the following {SOURCE_LANG} text into {TARGET_LANG}{EXTRA_INSTRUCTION}:
 
 
 {TEXT}
@@ -71,13 +71,22 @@ func ollamaTranslate(ctx context.Context, cfg *translate.Config) (string, error)
 	if len(cfg.Format) == 0 {
 		cfg.Format = `text`
 	}
+	var extraInstruction string
+	switch cfg.Format {
+	case `html`:
+		extraInstruction = ` and keep html tag unchanged`
+	case `markdown`:
+		extraInstruction = ` and keep markdown syntax`
+	default:
+	}
 	prompt := promptTemplate.ExecuteString(map[string]interface{}{
-		`SOURCE_LANG`:  sourceLang,
-		`SOURCE_CODE`:  cfg.From,
-		`TARGET_LANG`:  targetLang,
-		`TARGET_CODE`:  cfg.To,
-		`CONTENT_TYPE`: cfg.Format,
-		`TEXT`:         cfg.Input,
+		`SOURCE_LANG`:       sourceLang,
+		`SOURCE_CODE`:       cfg.From,
+		`TARGET_LANG`:       targetLang,
+		`TARGET_CODE`:       cfg.To,
+		`CONTENT_TYPE`:      cfg.Format,
+		`EXTRA_INSTRUCTION`: extraInstruction,
+		`TEXT`:              cfg.Input,
 	})
 	dsn := &ollama.DSN{
 		URL:   cfg.GetAPIConfig(`url`, `endpoint`),
@@ -86,11 +95,11 @@ func ollamaTranslate(ctx context.Context, cfg *translate.Config) (string, error)
 	client := ollama.NewOpenWebUiClient(dsn)
 	var result strings.Builder
 	req := ollama.Request{
-		Model:  "translategemma",
-		Prompt: prompt,
+		Model:   "translategemma",
+		Prompt:  prompt,
 		Options: &ollama.RequestOptions{
-			Temperature: new(0.9),
-			NumContext:  new(4096),
+			//Temperature: new(0.9),
+			//NumContext: new(4096),
 		},
 		OnJson: func(res ollama.Response) error {
 			if res.Response != nil {
@@ -99,6 +108,12 @@ func ollamaTranslate(ctx context.Context, cfg *translate.Config) (string, error)
 			//ppnocolor.Println(res)
 			return nil
 		},
+		/*//
+		OnCodeBlock: func(cb []*ollama.CodeBlock) error {
+			ppnocolor.Println(cb)
+			return nil
+		},
+		//*/
 	}
 	cv, ok := cfg.APIConfig[`model`]
 	if ok && len(cv) > 0 {

@@ -2,6 +2,7 @@ package ollama
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/admpub/translate"
@@ -21,25 +22,38 @@ func TestOLLAMA(t *testing.T) {
 
 	// - html -
 	result, err = ollamaTranslate(context.Background(), &translate.Config{
-		From:   `zh-CN`,
-		To:     `en`,
-		Input:  `<h1>测试一下这个</h1>`,
+		From: `zh-CN`,
+		To:   `en`,
+		Input: `<p>测试文字测试文字测试文字测试文字测试文字测试文字测试文字</p>
+<p>测试文字测试文字测试文字测试文字测试文字测试文字</p>
+<p>测试文字测试文字测试文字测试文字</p>
+<p>测试文字测试文字测试文字测试文字</p>`,
 		Format: `html`,
 	})
 	require.NoError(t, err)
 	t.Log(result)
-	require.Equal(t, `<h1>Test this out</h1>`, result)
+	require.Equal(t, `<p>Test text Test text Test text Test text Test text Test text Test text</p>
+<p>Test text Test text Test text Test text Test text Test text</p>
+<p>Test text Test text Test text Test text</p>
+<p>Test text Test text Test text Test text</p>`, strings.TrimSpace(result))
 
 	// - markdown -
 	result, err = ollamaTranslate(context.Background(), &translate.Config{
 		From: `zh-CN`,
 		To:   `en`,
 		Input: `# 测试一下这个
-内容在这里`,
+内容在这里
+` + "```" + `
+测试代码 测试代码 测试代码 测试代码 测试代码 测试代码 测试代码
+` + "```" + `
+`,
 		Format: `markdown`,
 	})
 	require.NoError(t, err)
 	t.Log(result)
-	require.Equal(t, `# Let's test this out
-Content goes here`, result)
+	require.Equal(t, `# Let's test this
+Content goes here
+`+"```"+`
+Test code Test code Test code Test code Test code Test code Test code
+`+"```", result)
 }

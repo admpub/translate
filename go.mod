@@ -5,6 +5,7 @@ go 1.26.1
 require (
 	github.com/admpub/fasttemplate v0.0.3
 	github.com/admpub/go-ollama v0.0.0-20260413043901-9877e7baaacd
+	github.com/admpub/pp v0.0.7
 	github.com/bregydoc/gtranslate v0.0.0-20200913051839-1bd07f6c1fc5
 	github.com/stretchr/testify v1.9.0
 	github.com/webx-top/com v1.5.1
