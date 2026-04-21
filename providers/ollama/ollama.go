@@ -21,8 +21,8 @@ func init() {
 // 用Docker启动ollama：https://docs.ollama.com/docker
 
 const (
-	PromptTranslateGEMMA = `You are a professional {SOURCE_LANG} ({SOURCE_CODE}) to {TARGET_LANG} ({TARGET_CODE}) translator. Your goal is to accurately convey the meaning and nuances of the original {SOURCE_LANG} text while adhering to {TARGET_LANG} grammar, vocabulary, and cultural sensitivities.
-Produce only the {TARGET_LANG} translation, without any additional explanations or commentary. Please translate the following {SOURCE_LANG} text into {TARGET_LANG}:
+	PromptTranslateGEMMA = `You are a professional {SOURCE_LANG} ({SOURCE_CODE}) to {TARGET_LANG} ({TARGET_CODE}) translator. Your goal is to accurately convey the meaning and nuances of the original {SOURCE_LANG} {CONTENT_TYPE} while adhering to {TARGET_LANG} grammar, vocabulary, and cultural sensitivities.
+Produce only the {TARGET_LANG} translation, without any additional explanations or commentary. Please translate the following {SOURCE_LANG} {CONTENT_TYPE} into {TARGET_LANG}:
 
 
 {TEXT}
@@ -68,12 +68,16 @@ func ollamaTranslate(ctx context.Context, cfg *translate.Config) (string, error)
 	cfg.From = fixLangCode(cfg.From)
 	sourceLang := codeLanguages[cfg.From]
 	targetLang := codeLanguages[cfg.To]
+	if len(cfg.Format) == 0 {
+		cfg.Format = `text`
+	}
 	prompt := promptTemplate.ExecuteString(map[string]interface{}{
-		`SOURCE_LANG`: sourceLang,
-		`SOURCE_CODE`: cfg.From,
-		`TARGET_LANG`: targetLang,
-		`TARGET_CODE`: cfg.To,
-		`TEXT`:        cfg.Input,
+		`SOURCE_LANG`:  sourceLang,
+		`SOURCE_CODE`:  cfg.From,
+		`TARGET_LANG`:  targetLang,
+		`TARGET_CODE`:  cfg.To,
+		`CONTENT_TYPE`: cfg.Format,
+		`TEXT`:         cfg.Input,
 	})
 	dsn := &ollama.DSN{
 		URL:   cfg.GetAPIConfig(`url`, `endpoint`),
