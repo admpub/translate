@@ -9,10 +9,19 @@ import (
 	"github.com/admpub/fasttemplate"
 	"github.com/admpub/go-ollama"
 	"github.com/admpub/translate"
+	"github.com/coscms/forms/config"
 )
 
 func init() {
-	translate.RegisterProvider(`ollama`, `Ollama`, ollamaTranslate)
+	translate.RegisterProvider(`ollama`, `Ollama`, ollamaTranslate, config.Element{
+		Name:  `endpoint`,
+		Type:  `url`,
+		Label: `Endpoint`,
+	}, config.Element{
+		Name:  `apikey`,
+		Type:  `text`,
+		Label: `Token`,
+	})
 }
 
 // $> curl -fsSL https://ollama.com/install.sh | sh
