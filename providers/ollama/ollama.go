@@ -14,9 +14,13 @@ import (
 
 func init() {
 	translate.RegisterProvider(`ollama`, `Ollama`, ollamaTranslate, config.Element{
-		Name:  `endpoint`,
-		Type:  `url`,
-		Label: `Endpoint`,
+		Name:     `endpoint`,
+		Type:     `url`,
+		Label:    `Endpoint`,
+		HelpText: `if a blank, use the local address: http://localhost:11434/api/generate`,
+		Attributes: [][]string{
+			{"placeholder", "http://localhost:11434/api/generate"},
+		},
 	}, config.Element{
 		Name:  `apikey`,
 		Type:  `text`,

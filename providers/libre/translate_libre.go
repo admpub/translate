@@ -9,7 +9,7 @@ import (
 	"github.com/webx-top/restyclient"
 )
 
-var DefaultHost = `libretranslate.com`
+var DefaultHost = `127.0.0.1:5000`
 
 type libreRequest struct {
 	Query string `json:"q"`
@@ -81,7 +81,7 @@ func libreTranslate(ctx context.Context, cfg *translate.Config) (string, error) 
 		endpoint = cfg.APIConfig[`endpoint`]
 	} else {
 		host := DefaultHost
-		scheme := `https`
+		scheme := `http`
 		if cfg.APIConfig[`scheme`] != `` {
 			scheme = cfg.APIConfig[`scheme`]
 		}

@@ -10,9 +10,15 @@ func init() {
 		Name:  `appid`,
 		Type:  `text`,
 		Label: `App ID`,
+		Attributes: [][]string{
+			{"required"},
+		},
 	}, config.Element{
 		Name:  `secret`,
 		Type:  `text`,
 		Label: `Secret`,
+		Attributes: [][]string{
+			{"required"},
+		},
 	})
 }
